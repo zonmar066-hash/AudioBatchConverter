@@ -62,9 +62,11 @@ object BatchConverter {
             try {
                 // Step 1: Copy to cache
                 cacheFile = File(cacheDir, "input_temp_$index")
-                context.contentResolver.openInputStream(uri)?.use { src ->
+                val copied = context.contentResolver.openInputStream(uri)?.use { src ->
                     cacheFile.outputStream().buffered().use { dst -> src.copyTo(dst) }
-                } ?: run {
+                    true
+                } ?: false
+                if (!copied) {
                     onProgress(index + 1, total,
                         ConversionResult(displayName, false, "无法读取文件"))
                     continue

@@ -93,7 +93,7 @@ object AudioDetector {
                 logNote = "未检测到采样率，已按${DEFAULT_SAMPLE_RATE}Hz处理"
             )
         } else {
-            AudioInfo(hasAudio = false, sampleRate = null)
+            AudioInfo(hasAudio = false, sampleRate = null, codecName = null)
         }
     }
 }

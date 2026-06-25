@@ -43,17 +43,18 @@ object LoudnormEngine {
         inputFile: String,
         outputFile: String,
         sampleRate: Int
-    ): LmResult = try {
-        // ── Pass 1: measure ──
-        val measureCmd = listOf(
-            ffmpegPath,
-            "-i", inputFile,
-            "-af", "loudnorm=I=$TARGET_I:LRA=$TARGET_LRA:TP=$TARGET_TP:print_format=json",
-            "-f", "null", "-"
-        )
+    ): LmResult {
+        try {
+            // ── Pass 1: measure ──
+            val measureCmd = listOf(
+                ffmpegPath,
+                "-i", inputFile,
+                "-af", "loudnorm=I=$TARGET_I:LRA=$TARGET_LRA:TP=$TARGET_TP:print_format=json",
+                "-f", "null", "-"
+            )
 
-        val measureOutput = FFmpegRunner.execute(measureCmd, timeoutSec = 60)
-        val jsonStr = extractJson(measureOutput)
+            val measureOutput = FFmpegRunner.execute(measureCmd, timeoutSec = 60)
+            val jsonStr = extractJson(measureOutput.stderr)
 
         if (jsonStr != null) {
             val json = try { JSONObject(jsonStr) } catch (_: Exception) { null }
@@ -112,6 +113,7 @@ object LoudnormEngine {
         } catch (e2: Exception) {
             return LmResult(success = false, logNote = "标准化失败: ${e2.message}")
         }
+    }
     }
 
     // ── Fallback paths ────────────────────────────────────────────────
