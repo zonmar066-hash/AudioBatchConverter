@@ -37,7 +37,7 @@ object LoudnormEngine {
      * @param outputFile   destination .aac file
      * @param sampleRate   target sample rate in Hz
      */
-    fun run(
+    suspend fun run(
         ffmpegPath: String,
         ffprobePath: String,
         inputFile: String,
@@ -116,7 +116,7 @@ object LoudnormEngine {
 
     // ── Fallback paths ────────────────────────────────────────────────
 
-    private fun singlePassLoudnorm(
+    private suspend fun singlePassLoudnorm(
         ffmpegPath: String, inputFile: String, outputFile: String, sr: Int
     ): LmResult {
         val cmd = listOf(
@@ -139,7 +139,7 @@ object LoudnormEngine {
         }
     }
 
-    private fun dynaudnormFallback(
+    private suspend fun dynaudnormFallback(
         ffmpegPath: String, inputFile: String, outputFile: String, sr: Int
     ): LmResult {
         val cmd = listOf(
@@ -163,7 +163,7 @@ object LoudnormEngine {
         }
     }
 
-    private fun directTranscode(
+    private suspend fun directTranscode(
         ffmpegPath: String, inputFile: String, outputFile: String, sr: Int, note: String
     ): LmResult {
         val cmd = listOf(
