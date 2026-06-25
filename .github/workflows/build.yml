@@ -1,0 +1,46 @@
+name: Build APK
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache FFmpeg binaries
+        id: cache-ffmpeg
+        uses: actions/cache@v4
+        with:
+          path: build/ffmpeg-out
+          key: ffmpeg-aarch64-v2-${{ hashFiles('scripts/build-ffmpeg.sh') }}
+
+      - name: Build FFmpeg
+        if: steps.cache-ffmpeg.outputs.cache-hit != 'true'
+        run: bash scripts/build-ffmpeg.sh
+
+      - name: Copy binaries to res/raw
+        run: |
+          mkdir -p app/src/main/res/raw
+          cp build/ffmpeg-out/bin/ffmpeg app/src/main/res/raw/ffmpeg
+          cp build/ffmpeg-out/bin/ffprobe app/src/main/res/raw/ffprobe
+          ls -lh app/src/main/res/raw/
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Build Release APK
+        run: ./gradlew assembleRelease
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: AudioBatchConverter
+          path: app/build/outputs/apk/release/app-release.apk
